@@ -1,15 +1,8 @@
 import React from 'react';
-import { Container, Box } from '@mui/material';
-import InterviewInterface from './components/InterviewInterface';
+import LandingPage from './components/LandingPage';
 
 function App() {
-  return (
-    <Container maxWidth="lg">
-      <Box sx={{ my: 4 }}>
-        <InterviewInterface />
-      </Box>
-    </Container>
-  );
+  return <LandingPage />;
 }
 
 export default App; 

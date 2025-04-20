@@ -24,6 +24,7 @@ import AssessmentIcon from '@mui/icons-material/Assessment';
 import SettingsIcon from '@mui/icons-material/Settings';
 import HelpIcon from '@mui/icons-material/Help';
 import TimerIcon from '@mui/icons-material/Timer';
+import CameraIcon from '@mui/icons-material/Camera';
 
 const darkTheme = createTheme({
   palette: {
@@ -75,14 +76,6 @@ const darkTheme = createTheme({
   },
 });
 
-const questions = [
-  'Tell me about your experience with React and its core concepts.',
-  'How do you handle state management in large applications?',
-  'Explain the difference between class components and functional components.',
-  'What are React hooks and how do you use them?',
-  'How do you optimize React application performance?'
-];
-
 interface FeedbackBoxProps {
   score: number | null;
 }
@@ -96,23 +89,65 @@ const InterviewInterface: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [timeElapsed, setTimeElapsed] = useState(0);
+  const [questions, setQuestions] = useState<string[]>([]);
+  const [showResults, setShowResults] = useState(false);
+  const [isCameraActive, setIsCameraActive] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const recognitionRef = useRef<any>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const [showResults, setShowResults] = useState(false);
+  const [isVideoMounted, setIsVideoMounted] = useState(false);
+
+  const startCamera = async () => {
+    try {
+      console.log('Starting camera...');
+      
+      // First get the camera stream
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { 
+          width: 1280, 
+          height: 720,
+          facingMode: "user"
+        } 
+      });
+      
+      // Then set the camera active state which will render the video element
+      setIsCameraActive(true);
+      
+      // Use a small timeout to ensure the video element is rendered
+      setTimeout(() => {
+        const videoElement = document.querySelector('video');
+        if (videoElement) {
+          console.log('Setting video stream...');
+          videoElement.srcObject = stream;
+          
+          videoElement.onloadedmetadata = () => {
+            console.log('Video metadata loaded, playing...');
+            videoElement.play().catch(err => {
+              console.error('Error playing video:', err);
+            });
+          };
+        } else {
+          console.error('Video element still not found after render');
+        }
+      }, 100);
+      
+    } catch (error) {
+      console.error('Error accessing camera:', error);
+      setFeedback('Error accessing camera. Please ensure you have granted camera permissions.');
+    }
+  };
+
+  const stopCamera = () => {
+    if (videoRef.current && videoRef.current.srcObject) {
+      const stream = videoRef.current.srcObject as MediaStream;
+      stream.getTracks().forEach(track => track.stop());
+      videoRef.current.srcObject = null;
+      setIsCameraActive(false);
+      console.log('Camera stopped');
+    }
+  };
 
   useEffect(() => {
-    const startCamera = async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-        }
-      } catch (error) {
-        console.error('Error accessing camera:', error);
-      }
-    };
-
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
       const recognition = new SpeechRecognition();
@@ -134,8 +169,56 @@ const InterviewInterface: React.FC = () => {
 
       recognitionRef.current = recognition;
     }
+  }, []);
 
-    startCamera();
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      try {
+        const apiKey = process.env.REACT_APP_GEMINI_API_KEY;
+        if (!apiKey) {
+          throw new Error('API key not found');
+        }
+
+        const response = await axios.post(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+          {
+            contents: [{
+              parts: [{
+                text: "Generate 5 technical interview questions for a React developer position. Format each question on a new line."
+              }]
+            }]
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+
+        if (response.data?.candidates?.[0]?.content?.parts?.[0]?.text) {
+          const questionsText = response.data.candidates[0].content.parts[0].text;
+          const questionsList = questionsText.split('\n').filter((q: string) => q.trim());
+          setQuestions(questionsList);
+        }
+      } catch (error) {
+        console.error('Error fetching questions:', error);
+        setQuestions([
+          'Tell me about your experience with React and its core concepts.',
+          'How do you handle state management in large applications?',
+          'Explain the difference between class components and functional components.',
+          'What are React hooks and how do you use them?',
+          'How do you optimize React application performance?'
+        ]);
+      }
+    };
+
+    fetchQuestions();
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      stopCamera();
+    };
   }, []);
 
   useEffect(() => {
@@ -235,6 +318,19 @@ const InterviewInterface: React.FC = () => {
     }
   };
 
+  if (questions.length === 0) {
+    return (
+      <ThemeProvider theme={darkTheme}>
+        <LoadingContainer>
+          <Typography variant="h5" color="primary">
+            Preparing your interview questions...
+          </Typography>
+          <CircularProgress color="primary" size={40} />
+        </LoadingContainer>
+      </ThemeProvider>
+    );
+  }
+
   if (showResults) {
     return (
       <ThemeProvider theme={darkTheme}>
@@ -315,16 +411,47 @@ const InterviewInterface: React.FC = () => {
 
         <MainContent>
           <VideoSection>
-            <VideoFeed ref={videoRef} autoPlay muted />
-            <StatusOverlay>
-              <RecordingStatus isRecording={isRecording}>
-                {isRecording ? 'Recording...' : 'Ready'}
-              </RecordingStatus>
-              <Timer>
-                <TimerIcon fontSize="small" />
-                {formatTime(timeElapsed)}
-              </Timer>
-            </StatusOverlay>
+            {!isCameraActive ? (
+              <CameraPlaceholder>
+                <Typography variant="h6" color="text.secondary" sx={{ mb: 2 }}>
+                  Camera is not active
+                </Typography>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={startCamera}
+                  startIcon={<CameraIcon />}
+                >
+                  Start Camera
+                </Button>
+              </CameraPlaceholder>
+            ) : (
+              <>
+                <VideoFeed 
+                  ref={videoRef}
+                  autoPlay 
+                  muted 
+                  playsInline
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    transform: 'scaleX(-1)',
+                    backgroundColor: '#000',
+                    display: 'block'
+                  }}
+                />
+                <StatusOverlay>
+                  <RecordingStatus isRecording={isRecording}>
+                    {isRecording ? 'Recording...' : 'Ready'}
+                  </RecordingStatus>
+                  <Timer>
+                    <TimerIcon fontSize="small" />
+                    {formatTime(timeElapsed)}
+                  </Timer>
+                </StatusOverlay>
+              </>
+            )}
           </VideoSection>
 
           <ContentSection>
@@ -464,12 +591,6 @@ const VideoSection = styled.div`
   overflow: hidden;
   height: 100%;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-`;
-
-const VideoFeed = styled.video`
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
 `;
 
 const StatusOverlay = styled.div`
@@ -670,6 +791,37 @@ const ResultsContent = styled.div`
 
 const ScoreSection = styled.div`
   text-align: center;
+`;
+
+const LoadingContainer = styled.div`
+  height: 100vh;
+  width: 100vw;
+  background: #0a0a0a;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+`;
+
+const VideoFeed = styled.video`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1);
+  background-color: #000;
+  display: block;
+`;
+
+const CameraPlaceholder = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: #1a1a1a;
+  border-radius: 8px;
 `;
 
 export default InterviewInterface; 
