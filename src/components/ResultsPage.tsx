@@ -246,42 +246,71 @@ const ResultsContainer = styled.div`
   background: #0a0a0a;
   display: flex;
   flex-direction: column;
-  padding: 24px;
+  padding: 16px;
   overflow-y: auto;
+
+  @media (max-width: 600px) {
+    padding: 12px;
+  }
 `;
 
 const Header = styled.div`
   display: flex;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
   padding: 0 8px;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  @media (max-width: 600px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
 `;
 
 const HeaderActions = styled.div`
   display: flex;
   gap: 8px;
   margin-left: auto;
+
+  @media (max-width: 600px) {
+    margin-left: 0;
+    width: 100%;
+    justify-content: space-between;
+  }
 `;
 
 const MainContent = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
+  padding: 0 8px;
+
+  @media (max-width: 600px) {
+    padding: 0;
+    gap: 12px;
+  }
 `;
 
 const ScoreSection = styled.div`
   display: flex;
   justify-content: center;
+  width: 100%;
 `;
 
 const ScoreCard = styled(Paper)`
-  padding: 24px;
+  padding: 16px;
   text-align: center;
   width: 100%;
   max-width: 400px;
+
+  @media (max-width: 600px) {
+    padding: 12px;
+  }
 `;
 
 const ScoreHeader = styled.div`
@@ -296,13 +325,23 @@ const ScoreDisplay = styled.div`
   width: 200px;
   height: 200px;
   margin: 0 auto 16px;
+
+  @media (max-width: 600px) {
+    width: 150px;
+    height: 150px;
+  }
 `;
 
 const StarRating = styled.div`
   display: flex;
   justify-content: center;
   gap: 4px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+
+  @media (max-width: 600px) {
+    gap: 2px;
+  }
 `;
 
 const PerformanceText = styled(Typography)`
@@ -316,8 +355,12 @@ const FeedbackSection = styled.div`
 `;
 
 const FeedbackCard = styled(Paper)`
-  padding: 24px;
+  padding: 16px;
   background: #1a1a1a;
+
+  @media (max-width: 600px) {
+    padding: 12px;
+  }
 `;
 
 const FeedbackText = styled.div`
@@ -325,9 +368,14 @@ const FeedbackText = styled.div`
   line-height: 1.5;
   color: #e0e0e0;
   font-size: 16px;
-  padding: 16px;
+  padding: 12px;
   background: #2d2d2d;
   border-radius: 8px;
+
+  @media (max-width: 600px) {
+    font-size: 14px;
+    padding: 10px;
+  }
   
   p {
     margin-bottom: 12px;
@@ -344,6 +392,10 @@ const FeedbackText = styled.div`
   .feedback-section {
     margin-bottom: 16px;
     font-size: 1.1em;
+
+    @media (max-width: 600px) {
+      font-size: 1em;
+    }
   }
 
   .question-block {
@@ -351,6 +403,11 @@ const FeedbackText = styled.div`
     padding: 12px;
     background: rgba(255, 255, 255, 0.05);
     border-radius: 8px;
+
+    @media (max-width: 600px) {
+      padding: 10px;
+      margin-bottom: 12px;
+    }
   }
 
   .question-title {
@@ -358,6 +415,10 @@ const FeedbackText = styled.div`
     font-weight: 600;
     margin-bottom: 8px;
     font-size: 1.1em;
+
+    @media (max-width: 600px) {
+      font-size: 1em;
+    }
   }
 
   .expected-answer {
@@ -366,6 +427,7 @@ const FeedbackText = styled.div`
     strong {
       display: block;
       margin-bottom: 4px;
+      font-size: 0.95em;
     }
     
     .answer-text {
@@ -374,6 +436,7 @@ const FeedbackText = styled.div`
       border-radius: 4px;
       border-left: 3px solid #7c4dff;
       margin-left: 4px;
+      font-size: 0.95em;
     }
   }
 
@@ -381,12 +444,14 @@ const FeedbackText = styled.div`
     strong {
       display: block;
       margin-bottom: 4px;
+      font-size: 0.95em;
     }
     
     .feedback-content {
       color: #b0b0b0;
       font-style: italic;
       margin-left: 4px;
+      font-size: 0.95em;
     }
   }
 `;
@@ -396,22 +461,38 @@ const QASection = styled.div`
 `;
 
 const QACard = styled(Paper)`
-  padding: 24px;
+  padding: 16px;
   background: #1a1a1a;
+
+  @media (max-width: 600px) {
+    padding: 12px;
+  }
 `;
 
 const QABlock = styled.div`
   margin-bottom: 16px;
+
+  @media (max-width: 600px) {
+    margin-bottom: 12px;
+  }
 `;
 
 const Question = styled.div`
-  margin-bottom: 16px;
+  margin-bottom: 12px;
+
+  @media (max-width: 600px) {
+    margin-bottom: 8px;
+  }
 `;
 
 const Answer = styled.div`
   background: #2d2d2d;
-  padding: 16px;
+  padding: 12px;
   border-radius: 8px;
+
+  @media (max-width: 600px) {
+    padding: 10px;
+  }
 `;
 
 export default ResultsPage; 

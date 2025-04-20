@@ -508,6 +508,10 @@ const InterviewContainer = styled.div`
   top: 0;
   left: 0;
   overflow: hidden;
+
+  @media (max-width: 600px) {
+    padding: 8px;
+  }
 `;
 
 const Header = styled.div`
@@ -517,11 +521,23 @@ const Header = styled.div`
   margin-bottom: 12px;
   padding: 0 8px;
   height: 40px;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  @media (max-width: 600px) {
+    height: auto;
+    margin-bottom: 8px;
+  }
 `;
 
 const HeaderActions = styled.div`
   display: flex;
   gap: 8px;
+
+  @media (max-width: 600px) {
+    width: 100%;
+    justify-content: space-between;
+  }
 `;
 
 const MainContent = styled.div`
@@ -530,9 +546,15 @@ const MainContent = styled.div`
   height: calc(100vh - 64px);
   gap: 12px;
   flex: 1;
+
   @media (max-width: 1200px) {
     flex-direction: column;
-    height: calc(100vh - 64px);
+    height: auto;
+    min-height: calc(100vh - 64px);
+  }
+
+  @media (max-width: 600px) {
+    gap: 8px;
   }
 `;
 
@@ -544,6 +566,16 @@ const VideoSection = styled.div`
   overflow: hidden;
   height: 100%;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  min-height: 300px;
+
+  @media (max-width: 1200px) {
+    height: 400px;
+  }
+
+  @media (max-width: 600px) {
+    height: 300px;
+    border-radius: 4px;
+  }
 `;
 
 const StatusOverlay = styled.div`
@@ -555,6 +587,12 @@ const StatusOverlay = styled.div`
   flex-direction: column;
   gap: 8px;
   align-items: flex-end;
+
+  @media (max-width: 600px) {
+    top: 12px;
+    right: 12px;
+    gap: 4px;
+  }
 `;
 
 const RecordingStatus = styled.div<{ isRecording: boolean }>`
@@ -567,6 +605,12 @@ const RecordingStatus = styled.div<{ isRecording: boolean }>`
   display: flex;
   align-items: center;
   gap: 8px;
+  font-size: 14px;
+
+  @media (max-width: 600px) {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
 `;
 
 const Timer = styled.div`
@@ -578,6 +622,12 @@ const Timer = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
+  font-size: 14px;
+
+  @media (max-width: 600px) {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
 `;
 
 const ContentSection = styled.div`
@@ -588,6 +638,15 @@ const ContentSection = styled.div`
   min-width: 400px;
   height: 100%;
   overflow: hidden;
+
+  @media (max-width: 1200px) {
+    min-width: 0;
+    height: auto;
+  }
+
+  @media (max-width: 600px) {
+    gap: 8px;
+  }
 `;
 
 const QuestionBox = styled(Paper)`
@@ -596,6 +655,12 @@ const QuestionBox = styled(Paper)`
   height: 100px;
   display: flex;
   flex-direction: column;
+
+  @media (max-width: 600px) {
+    padding: 8px;
+    height: auto;
+    min-height: 80px;
+  }
 `;
 
 const QuestionHeader = styled.div`
@@ -604,6 +669,10 @@ const QuestionHeader = styled.div`
   gap: 8px;
   margin-bottom: 8px;
   height: 24px;
+
+  @media (max-width: 600px) {
+    margin-bottom: 4px;
+  }
 `;
 
 const QuestionText = styled(Typography)`
@@ -615,6 +684,11 @@ const QuestionText = styled(Typography)`
   -webkit-box-orient: vertical;
   font-size: 16px;
   line-height: 1.4;
+
+  @media (max-width: 600px) {
+    font-size: 14px;
+    line-height: 1.3;
+  }
 `;
 
 const AnswerBox = styled(Paper)`
@@ -622,6 +696,10 @@ const AnswerBox = styled(Paper)`
   background: #1a1a1a;
   flex: 1;
   min-height: 0;
+
+  @media (max-width: 600px) {
+    padding: 8px;
+  }
 `;
 
 const AnswerText = styled.div`
@@ -634,6 +712,13 @@ const AnswerText = styled.div`
   font-size: 14px;
   line-height: 1.5;
   overflow: hidden;
+
+  @media (max-width: 600px) {
+    margin-top: 8px;
+    padding: 8px;
+    font-size: 13px;
+    line-height: 1.4;
+  }
 `;
 
 const Controls = styled.div`
@@ -643,6 +728,13 @@ const Controls = styled.div`
   margin-top: 12px;
   padding: 8px 0;
   height: 60px;
+  flex-wrap: wrap;
+
+  @media (max-width: 600px) {
+    gap: 8px;
+    margin-top: 8px;
+    height: auto;
+  }
 `;
 
 const FeedbackBox = styled(Paper)<FeedbackBoxProps>`
@@ -651,6 +743,12 @@ const FeedbackBox = styled(Paper)<FeedbackBoxProps>`
   margin-top: 12px;
   height: 200px;
   display: ${props => props.score === null ? 'none' : 'block'};
+
+  @media (max-width: 600px) {
+    padding: 8px;
+    height: auto;
+    min-height: 150px;
+  }
 `;
 
 const FeedbackHeader = styled.div`
@@ -658,12 +756,21 @@ const FeedbackHeader = styled.div`
   align-items: center;
   gap: 8px;
   margin-bottom: 24px;
+
+  @media (max-width: 600px) {
+    margin-bottom: 16px;
+  }
 `;
 
 const ScoreDisplay = styled.div`
   width: 100px;
   height: 100px;
   margin: 0 auto 12px;
+
+  @media (max-width: 600px) {
+    width: 80px;
+    height: 80px;
+  }
 `;
 
 const FeedbackSection = styled.div`
@@ -755,6 +862,10 @@ const LoadingContainer = styled.div`
   justify-content: center;
   align-items: center;
   gap: 24px;
+
+  @media (max-width: 600px) {
+    gap: 16px;
+  }
 `;
 
 const VideoFeed = styled.video`
@@ -775,6 +886,10 @@ const CameraPlaceholder = styled.div`
   align-items: center;
   background: #1a1a1a;
   border-radius: 8px;
+
+  @media (max-width: 600px) {
+    border-radius: 4px;
+  }
 `;
 
 export default InterviewInterface; 
