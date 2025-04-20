@@ -184,7 +184,7 @@ const InterviewInterface: React.FC = () => {
           {
             contents: [{
               parts: [{
-                text: "Generate 5 technical interview questions for a React developer position. Format each question on a new line."
+                text: "Generate 5 really very very easy technical interview questions for a college student. Format each question on a new line."
               }]
             }]
           },
