@@ -25,6 +25,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import HelpIcon from '@mui/icons-material/Help';
 import TimerIcon from '@mui/icons-material/Timer';
 import CameraIcon from '@mui/icons-material/Camera';
+import ResultsPage from './ResultsPage';
 
 const darkTheme = createTheme({
   palette: {
@@ -96,6 +97,7 @@ const InterviewInterface: React.FC = () => {
   const recognitionRef = useRef<any>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const [isVideoMounted, setIsVideoMounted] = useState(false);
+  const [isVideoReady, setIsVideoReady] = useState(false);
 
   const startCamera = async () => {
     try {
@@ -110,26 +112,28 @@ const InterviewInterface: React.FC = () => {
         } 
       });
       
-      // Then set the camera active state which will render the video element
+      // Set the camera active state which will render the video element
       setIsCameraActive(true);
       
-      // Use a small timeout to ensure the video element is rendered
-      setTimeout(() => {
-        const videoElement = document.querySelector('video');
-        if (videoElement) {
+      // Wait for video element to be ready
+      const checkVideoReady = () => {
+        if (videoRef.current) {
           console.log('Setting video stream...');
-          videoElement.srcObject = stream;
+          videoRef.current.srcObject = stream;
           
-          videoElement.onloadedmetadata = () => {
+          videoRef.current.onloadedmetadata = () => {
             console.log('Video metadata loaded, playing...');
-            videoElement.play().catch(err => {
+            videoRef.current?.play().catch(err => {
               console.error('Error playing video:', err);
             });
           };
         } else {
-          console.error('Video element still not found after render');
+          console.log('Waiting for video element...');
+          setTimeout(checkVideoReady, 100);
         }
-      }, 100);
+      };
+      
+      checkVideoReady();
       
     } catch (error) {
       console.error('Error accessing camera:', error);
@@ -184,7 +188,7 @@ const InterviewInterface: React.FC = () => {
           {
             contents: [{
               parts: [{
-                text: "Generate 5 really very very easy technical oral interview questions for a college student. Format each question on a new line."
+                text: "Generate 5 really very very easy short answer(like one line) common technical oral interview questions for a college student. Format each question on a new line."
               }]
             }]
           },
@@ -216,6 +220,7 @@ const InterviewInterface: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    startCamera();
     return () => {
       stopCamera();
     };
@@ -333,58 +338,12 @@ const InterviewInterface: React.FC = () => {
 
   if (showResults) {
     return (
-      <ThemeProvider theme={darkTheme}>
-        <ResultsContainer>
-          <ResultsContent>
-            <ScoreSection>
-              <Typography variant="h4" color="primary" sx={{ mb: 4 }}>
-                Interview Results
-              </Typography>
-              <ScoreDisplay>
-                <CircularProgressbar
-                  value={score || 0}
-                  text={`${score || 0}%`}
-                  styles={{
-                    path: { stroke: `rgba(124, 77, 255, ${(score || 0) / 100})` },
-                    text: { fill: '#7c4dff', fontSize: '32px', fontWeight: 'bold' },
-                    trail: { stroke: '#2d2d2d' }
-                  }}
-                />
-              </ScoreDisplay>
-            </ScoreSection>
-            <FeedbackSection>
-              <Typography variant="h5" color="primary" sx={{ mb: 3 }}>
-                Detailed Feedback
-              </Typography>
-              <FeedbackText dangerouslySetInnerHTML={{ 
-                __html: feedback
-                  .split('\n')
-                  .map(line => {
-                    if (line.startsWith('Score:')) {
-                      return `<strong>${line}</strong>`;
-                    }
-                    if (line.startsWith('-') || line.match(/^\d+\./)) {
-                      return `<li>${line.replace(/^-|\d+\./, '').trim()}</li>`;
-                    }
-                    return `<p>${line}</p>`;
-                  })
-                  .join('')
-                  .replace(/<li>/g, '<ul><li>')
-                  .replace(/<\/li>/g, '</li></ul>')
-                  .replace(/<\/ul><ul>/g, '')
-              }} />
-            </FeedbackSection>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => setShowResults(false)}
-              sx={{ mt: 4, width: '200px' }}
-            >
-              Back to Interview
-            </Button>
-          </ResultsContent>
-        </ResultsContainer>
-      </ThemeProvider>
+      <ResultsPage
+        score={score || 0}
+        feedback={feedback}
+        answers={answers}
+        onBack={() => setShowResults(false)}
+      />
     );
   }
 
@@ -414,21 +373,15 @@ const InterviewInterface: React.FC = () => {
             {!isCameraActive ? (
               <CameraPlaceholder>
                 <Typography variant="h6" color="text.secondary" sx={{ mb: 2 }}>
-                  Camera is not active
+                  Initializing camera...
                 </Typography>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={startCamera}
-                  startIcon={<CameraIcon />}
-                >
-                  Start Camera
-                </Button>
+                <CircularProgress color="primary" />
               </CameraPlaceholder>
             ) : (
               <>
                 <VideoFeed 
                   ref={videoRef}
+                  onLoad={() => setIsVideoReady(true)}
                   autoPlay 
                   muted 
                   playsInline
